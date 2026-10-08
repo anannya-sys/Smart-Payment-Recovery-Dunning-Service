@@ -12,7 +12,6 @@ subscription-recovery-service/
 ├── Dockerfile                      # multi-stage build (Maven -> slim JRE)
 ├── docker-compose.yml              # app + postgres
 ├── README.md
-├── INTERVIEW_GUIDE.md
 └── src
     ├── main/java/com/subscription/recovery
     │   ├── SubscriptionRecoveryApplication.java
@@ -46,7 +45,7 @@ subscription-recovery-service/
 4. Billing job, recovery (retry) job, subscription state machine, analytics endpoint.
 5. Simulation (1,000 customers x 6 months, smart vs fixed baseline) as endpoint + startup command.
 6. Tests (unit + Testcontainers), Dockerfile, docker-compose, README.
-7. Run the full simulation and record results; write INTERVIEW_GUIDE.md.
+7. Run the full simulation and record results.
 
 ## Key design decisions (short)
 - **Strategy pattern** for retries: one class per failure reason; `SmartRecoveryPolicy` picks the strategy and
