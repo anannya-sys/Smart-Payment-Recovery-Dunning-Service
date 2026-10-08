@@ -1,0 +1,5 @@
+# Test profile: disable the cron jobs ("-" means "never") so tests trigger jobs explicitly.
+billing:
+  cron: "-"
+recovery:
+  cron: "-"

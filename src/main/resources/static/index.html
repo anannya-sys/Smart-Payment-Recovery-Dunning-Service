@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Subscription Recovery</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Cpath d='M9 17l4 4 10-10' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    // Apply the saved theme before first paint so the page doesn't flash.
+    try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">
+      <div class="logo-mark">R</div>
+      <div class="logo-text"><strong>RecoverPay</strong><span>Subscription recovery</span></div>
+    </div>
+    <nav class="nav" id="nav">
+      <a href="#/overview" data-route="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Overview
+      </a>
+      <a href="#/recovery" data-route="recovery">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg>
+        Recovery queue <span class="count hidden" id="queue-count"></span>
+      </a>
+      <div class="nav-section">Manage</div>
+      <a href="#/subscriptions" data-route="subscriptions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        Subscriptions
+      </a>
+      <a href="#/customers" data-route="customers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Customers
+      </a>
+      <a href="#/plans" data-route="plans">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+        Plans
+      </a>
+      <div class="nav-section">Analyse</div>
+      <a href="#/simulation" data-route="simulation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>
+        Simulation lab
+      </a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="policy-pill"><span class="dot" id="health-dot"></span><span id="health-text">Checking service…</span></div>
+      <a href="swagger-ui.html" target="_blank" rel="noopener">API docs (Swagger) ↗</a>
+      <a href="actuator/health" target="_blank" rel="noopener">Health endpoint ↗</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="btn icon-btn menu-btn" id="menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div>
+        <div class="crumb" id="crumb">Dashboard</div>
+        <h1 id="page-title">Overview</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn" id="run-billing" title="Create and charge invoices for subscriptions due today">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg>
+          <span class="label">Run billing</span>
+        </button>
+        <button class="btn btn-primary" id="run-recovery" title="Process due retries, reminders and write-offs now">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          <span class="label">Run recovery</span>
+        </button>
+        <button class="btn icon-btn" id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </header>
+    <main class="content" id="view"></main>
+  </div>
+</div>
+
+<div class="overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div style="flex:1">
+      <div class="crumb subtle" id="drawer-kicker"></div>
+      <h2 id="drawer-title"></h2>
+    </div>
+    <button class="btn icon-btn btn-ghost" id="drawer-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<div class="overlay modal-overlay" id="modal-overlay"></div>
+<form class="modal" id="modal" novalidate>
+  <div class="modal-head"><h2 id="modal-title"></h2><p id="modal-sub"></p></div>
+  <div class="modal-body" id="modal-body"></div>
+  <div class="modal-foot">
+    <button type="button" class="btn" id="modal-cancel">Cancel</button>
+    <button type="submit" class="btn btn-primary" id="modal-submit">Save</button>
+  </div>
+</form>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

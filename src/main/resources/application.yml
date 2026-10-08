@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: subscription-recovery-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/recovery}
+    username: ${DB_USERNAME:recovery}
+    password: ${DB_PASSWORD:recovery}
+  jpa:
+    # Flyway owns the schema; Hibernate only checks that entities match it.
+    hibernate:
+      ddl-auto: validate
+    # Don't keep DB sessions open during view rendering; all data access stays in @Transactional services.
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Kolkata
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# ---- Domain configuration -------------------------------------------------
+app:
+  time-zone: Asia/Kolkata
+
+billing:
+  # Every day at 09:00 IST: create and charge invoices for subscriptions due today.
+  cron: "0 0 9 * * *"
+
+recovery:
+  # How often the recovery job looks for due retries / reminders / deadlines.
+  cron: "0 */15 * * * *"
+  # Which policy the live service uses: SMART or FIXED (the baseline).
+  policy: ${RECOVERY_POLICY:SMART}
+  # Days after the first failure before the invoice is written off and the subscription cancelled.
+  recovery-window-days: 28
+
+gateway:
+  # Seed for the simulated gateway. Same seed => same outcomes.
+  seed: 42
+
+logging:
+  level:
+    com.subscription.recovery: INFO

@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: recovery
+      POSTGRES_USER: recovery
+      POSTGRES_PASSWORD: recovery
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recovery -d recovery"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy   # wait until Postgres accepts connections
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/recovery
+      DB_USERNAME: recovery
+      DB_PASSWORD: recovery
+      RECOVERY_POLICY: SMART
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  pgdata:

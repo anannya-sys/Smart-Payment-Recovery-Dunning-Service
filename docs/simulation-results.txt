@@ -1,0 +1,44 @@
+
+Simulation: 1000 customers x 6 months from 2026-01-01 (seed 42)
+Metric                                        SMART            FIXED
+--------------------------------------------------------------------
+Invoices issued                                5473             5163
+Invoices with a failed payment                 1486             1363
+Recovered invoices                             1293             1064
+Written-off invoices                            193              299
+Failed revenue (INR)                      954564.00        854287.00
+Recovered revenue (INR)                   822157.00        651636.00
+Recovery rate (revenue %)                     86.13            76.28
+Recovery rate (invoices %)                    87.01            78.06
+Policy retries (gateway calls)                 1778             2573
+Customer-initiated payments                     213              405
+Reminders sent                                 1091             2978
+Avg days to recover                             7.4              4.6
+Cancellations from retry fatigue                 18               67
+Subscriptions cancelled                         193              299
+Active subscriptions at end                     807              701
+Total revenue collected (INR)            3489520.00       3190236.00
+--------------------------------------------------------------------
+Recovery-rate lift: 9.85 percentage points; extra revenue recovered: INR 170521.00
+
+By first failure reason (recovered / failed = rate)
+INSUFFICIENT_BALANCE   SMART 1062/1191 =  89.17%   FIXED  874/1093 =  79.96%
+MANDATE_REVOKED        SMART   36/87   =  41.38%   FIXED   25/81   =  30.86%
+LIMIT_EXCEEDED         SMART   88/88   = 100.00%   FIXED   83/84   =  98.81%
+BANK_DOWNTIME          SMART   86/87   =  98.85%   FIXED   69/75   =  92.00%
+CARD_EXPIRED           SMART   21/33   =  63.64%   FIXED   13/30   =  43.33%
+
+
+Robustness check: same scenario (1000 customers x 6 months), seeds 1-10
+seed  SMART %  FIXED %  lift (pp)
+   1    85.70    82.23      3.47
+   2    85.44    78.49      6.95
+   3    86.77    79.16      7.61
+   4    87.35    82.78      4.57
+   5    88.25    79.80      8.45
+   6    86.68    77.97      8.71
+   7    85.68    78.20      7.48
+   8    86.83    80.74      6.09
+   9    86.92    77.91      9.01
+  10    84.97    81.08      3.89
+mean lift 6.62 pp, min 3.47, max 9.01; smart ahead in 10/10 seeds
